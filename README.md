@@ -6,7 +6,7 @@
 
 
 ## Como Executar
-**Prerequisites:**  Node.js
+**Prerequisites:**  Node.js  v24. 15.0
 
  Install dependencies:
    `npm install`
