@@ -1,0 +1,46 @@
+# Database Schema
+
+## Entities
+
+### User
+- uid: string (PK)
+- email: string (Unique)
+- password: string
+- displayName: string
+- role: 'admin' | 'teacher'
+- subject: string (optional)
+
+### Schedule
+- id: integer (PK, AI)
+- subject: string
+- date: string
+- startTime: string
+- endTime: string
+- room: string
+- teacherId: string (FK)
+- teacherName: string
+- classGroup: string
+- status: 'pending' | 'confirmed' | 'absent' | 'vaga'
+
+### Lab
+- id: string (PK)
+- name: string
+
+### LabBooking
+- id: integer (PK, AI)
+- labId: string (FK)
+- teacherId: string (FK)
+- teacherName: string
+- date: string
+- startTime: string
+- endTime: string
+
+### Certificate
+- id: integer (PK, AI)
+- teacherId: string (FK)
+- teacherName: string
+- date: string
+- reason: string
+- imageUrl: string (Base64 or path)
+- status: 'pending' | 'approved'
+- createdAt: timestamp

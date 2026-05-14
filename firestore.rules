@@ -1,0 +1,83 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      return request.auth.token.email_verified == true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function getUserData(userId) {
+      return get(/databases/$(database)/documents/users/$(userId)).data;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && getUserData(request.auth.uid).role == 'admin';
+    }
+
+    function isTeacher() {
+      return isSignedIn() && getUserData(request.auth.uid).role == 'teacher';
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // --- User Validation ---
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email', 'role']) &&
+             data.keys().size() >= 3 &&
+             data.uid is string && data.uid.size() <= 128 &&
+             data.email is string && data.email.size() <= 256 &&
+             data.role in ['admin', 'teacher'];
+    }
+
+    // --- Schedule Validation ---
+    function isValidSchedule(data) {
+      return data.keys().hasAll(['date', 'startTime', 'endTime', 'subject', 'teacherId', 'status']) &&
+             data.date is string && data.date.size() <= 10 &&
+             data.startTime is string && data.startTime.size() <= 5 &&
+             data.endTime is string && data.endTime.size() <= 5 &&
+             data.subject is string && data.subject.size() <= 100 &&
+             data.teacherId is string && data.teacherId.size() <= 128 &&
+             data.status in ['pending', 'confirmed', 'absent'];
+    }
+
+    // --- Collections ---
+
+    match /users/{userId} {
+      allow get: if isSignedIn() && (isOwner(userId) || isAdmin());
+      allow list: if isAdmin();
+      allow create: if isSignedIn() && isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isSignedIn() && isOwner(userId) && isValidUser(request.resource.data) && 
+                      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'email']) ||
+                      isAdmin();
+    }
+
+    match /schedules/{scheduleId} {
+      allow read: if isSignedIn();
+      allow create: if isAdmin() && isValidSchedule(request.resource.data);
+      allow update: if (
+        isAdmin() && isValidSchedule(request.resource.data)
+      ) || (
+        isSignedIn() && 
+        resource.data.teacherId == request.auth.uid && 
+        isValidSchedule(request.resource.data) &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt'])
+      );
+      allow delete: if isAdmin();
+    }
+  }
+}
