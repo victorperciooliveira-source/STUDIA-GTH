@@ -8,8 +8,101 @@
 @media print {
   body {
     background-color: white !important;
+    color: black !important;
+    font-size: 10px;
+    margin: 0 !important;
+    padding: 0 !important;
   }
+  
   .print\:hidden {
     display: none !important;
   }
+
+  /* Make printable sheet container span the whole width and have no screen-based shadows/borders */
+  .printable-sheet {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Prevent individual teacher cards from breaking mid-way across printed pages */
+  .break-inside-avoid {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Configure horizontal / landscape A4 print template */
+  @page {
+    size: landscape;
+    margin: 0.8cm;
+  }
 }
+
+/* Force standard HEX colors on .printable-sheet to prevent html2canvas oklch parsing errors */
+.printable-sheet.bg-white,
+.printable-sheet .bg-white {
+  background-color: #ffffff !important;
+}
+
+.printable-sheet,
+.printable-sheet * {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+.printable-sheet.border-slate-200,
+.printable-sheet .border-slate-200 {
+  border-color: #e2e8f0 !important;
+}
+
+.printable-sheet .border-slate-100 {
+  border-color: #f1f5f9 !important;
+}
+
+.printable-sheet .border-slate-300 {
+  border-color: #cbd5e1 !important;
+}
+
+.printable-sheet .border-indigo-100 {
+  border-color: #e0e7ff !important;
+}
+
+.printable-sheet .divide-slate-100 > * {
+  border-color: #f1f5f9 !important;
+}
+
+.printable-sheet .bg-slate-50 {
+  background-color: #f8fafc !important;
+}
+
+.printable-sheet .bg-slate-100 {
+  background-color: #f1f5f9 !important;
+}
+
+.printable-sheet .text-slate-900 {
+  color: #0f172a !important;
+}
+
+.printable-sheet .text-slate-800 {
+  color: #1e293b !important;
+}
+
+.printable-sheet .text-slate-700 {
+  color: #334155 !important;
+}
+
+.printable-sheet .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+.printable-sheet .text-slate-300 {
+  color: #cbd5e1 !important;
+}
+
+.printable-sheet .text-indigo-600 {
+  color: #4f46e5 !important;
+}
+

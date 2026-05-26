@@ -153,11 +153,11 @@ async function startServer() {
 
   // Create Schedule
   app.post('/api/schedules', (req, res) => {
-    const { date, startTime, endTime, subject, room, teacherId, teacherName } = req.body;
+    const { date, startTime, endTime, subject, room, teacherId, teacherName, classGroup } = req.body;
     const info = db.prepare(`
-      INSERT INTO schedules (date, startTime, endTime, subject, room, teacherId, teacherName, status)
-      VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')
-    `).run(date, startTime, endTime, subject, room, teacherId, teacherName);
+      INSERT INTO schedules (date, startTime, endTime, subject, room, teacherId, teacherName, classGroup, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')
+    `).run(date, startTime, endTime, subject, room, teacherId, teacherName, classGroup || null);
     
     res.json({ id: info.lastInsertRowid, status: 'success' });
   });
